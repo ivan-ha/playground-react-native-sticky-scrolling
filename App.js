@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, SafeAreaView, View, FlatList } from 'react-native';
+import { Button, StyleSheet, Text, SafeAreaView, View, FlatList } from 'react-native';
+import { useState } from 'react';
 
 const data = [...Array(20).keys()].map(i => ({
   id: i,
@@ -13,17 +14,28 @@ const Item = ({ text }) => (
 );
 
 const App = () => {
+  const [isSticky, setIsSticky] = useState(false)
+
+  const onButtonPress = () => {
+    setIsSticky((isSticky) => !isSticky)
+  }
+
   const renderItem = ({ item }) => (
     <Item text={item.text} />
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      <Text>Press below button to toggle Item 0 stickiness</Text>
+      <Button
+        onPress={onButtonPress}
+        title={isSticky ? 'Un-stick' : 'Stick'}
+      />
       <FlatList
         data={data}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+        stickyHeaderIndices={isSticky ? [0] : []}
       />
       <StatusBar style="auto" />
     </SafeAreaView>
