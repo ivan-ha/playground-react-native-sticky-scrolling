@@ -2,13 +2,20 @@ import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, SafeAreaView, View, FlatList } from 'react-native';
 import { useState } from 'react';
 
+const randomColor = () => {
+  const color = Math.floor(Math.random() * 16777215)
+    .toString(16)
+    .padStart(6, '0');
+  return `#${color}`;
+};
+
 const data = [...Array(20).keys()].map(i => ({
   id: i,
   text: `Item ${i}`
 }))
 
-const Item = ({ text }) => (
-  <View style={styles.item}>
+const Item = ({ text, backgroundColor }) => (
+  <View style={[styles.item, { backgroundColor }]}>
     <Text style={styles.text}>{text}</Text>
   </View>
 );
@@ -20,20 +27,20 @@ const App = () => {
     setIsSticky((isSticky) => !isSticky)
   }
 
-  const renderItem = ({ item }) => (
-    <Item text={item.text} />
+  const renderItem = backgroundColor => ({ item }) => (
+    <Item text={item.text} backgroundColor={backgroundColor}/>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Press below button to toggle Item 0 stickiness</Text>
+      <Text>Press below button to toggle Item 0 stickiness. Color change indicates a re-render.</Text>
       <Button
         onPress={onButtonPress}
         title={isSticky ? 'Un-stick' : 'Stick'}
       />
       <FlatList
         data={data}
-        renderItem={renderItem}
+        renderItem={renderItem(randomColor())}
         keyExtractor={item => item.id}
         stickyHeaderIndices={isSticky ? [0] : []}
       />
