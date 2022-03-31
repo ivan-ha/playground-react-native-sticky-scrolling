@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, SafeAreaView, View, FlatList } from 'react-native';
+import { Button, StyleSheet, Text, SafeAreaView, View, FlatList, ScrollView } from 'react-native';
 import { useState } from 'react';
 
 const randomColor = () => {
@@ -22,6 +22,7 @@ const Item = ({ text, backgroundColor }) => (
 
 const App = () => {
   const [isSticky, setIsSticky] = useState(false)
+  const color = randomColor()
 
   const onButtonPress = () => {
     setIsSticky((isSticky) => !isSticky)
@@ -38,12 +39,9 @@ const App = () => {
         onPress={onButtonPress}
         title={isSticky ? 'Un-stick' : 'Stick'}
       />
-      <FlatList
-        data={data}
-        renderItem={renderItem(randomColor())}
-        keyExtractor={item => item.id}
-        stickyHeaderIndices={isSticky ? [0] : []}
-      />
+      <ScrollView>
+        {data.map(d => renderItem(color)({ item: d }))}
+      </ScrollView>
       <StatusBar style="auto" />
     </SafeAreaView>
   );
