@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, SafeAreaView, View, FlatList, ScrollView } from 'react-native';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 const randomColor = () => {
   const color = Math.floor(Math.random() * 16777215)
@@ -14,23 +14,30 @@ const data = [...Array(20).keys()].map(i => ({
   text: `Item ${i}`
 }))
 
-const Item = ({ text, backgroundColor }) => (
-  <View style={[styles.item, { backgroundColor }]}>
-    <Text style={styles.text}>{text}</Text>
-  </View>
-);
+const _Item = ({ text })  => {
+  console.log('render')
+  return (
+    <View style={styles.item}>
+      <Text style={styles.text}>{text}</Text>
+    </View>
+  );
+}
+
+const Item = memo(_Item, () => true)
 
 const App = () => {
   const [isSticky, setIsSticky] = useState(false)
-  const color = randomColor()
 
   const onButtonPress = () => {
     setIsSticky((isSticky) => !isSticky)
   }
 
-  const renderItem = backgroundColor => ({ item }) => (
-    <Item text={item.text} backgroundColor={backgroundColor}/>
-  );
+  const renderItem = ({ item }) => {
+    console.log('renderItem')
+    return (
+      <Item text={item.text} />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,8 +46,10 @@ const App = () => {
         onPress={onButtonPress}
         title={isSticky ? 'Un-stick' : 'Stick'}
       />
-      <ScrollView>
-        {data.map(d => renderItem(color)({ item: d }))}
+      <ScrollView
+        stickyHeaderIndices={isSticky ? [0] : []}
+      >
+        {data.map(d => renderItem({ item: d }))}
       </ScrollView>
       <StatusBar style="auto" />
     </SafeAreaView>
