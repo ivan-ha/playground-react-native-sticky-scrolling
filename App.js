@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, SafeAreaView, View, FlatList, ScrollView } from 'react-native';
-import { useState, memo } from 'react';
+import { useState, useRef } from 'react';
 
 const randomColor = () => {
   const color = Math.floor(Math.random() * 16777215)
@@ -25,27 +25,27 @@ const Item = ({ text })  => {
 const renderItem = ({ item }) => {
   console.log('renderItem')
   return (
-    <Item text={item.text} />
+    <Item text={item.text} key={item.id} />
   );
 }
 
-const renderData = data.map(d => renderItem({ item: d }))
+const [itemZero, ...restData] = data
+const renderData = restData.map(d => renderItem({ item: d }))
 
 const App = () => {
   const [isSticky, setIsSticky] = useState(false)
 
-  const onButtonPress = () => {
-    setIsSticky((isSticky) => !isSticky)
-  }
+  const onScroll = event => {
+    setIsSticky(event.nativeEvent.contentOffset.y >= 100);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <Text>Press below button to toggle Item 0 stickiness. Color change indicates a re-render.</Text>
-      <Button
-        onPress={onButtonPress}
-        title={isSticky ? 'Un-stick' : 'Stick'}
-      />
-      <ScrollView>
+      {isSticky && <Item text={data[0].text} />}
+
+      <ScrollView onScroll={onScroll} scrollEventThrottle={16}>
+        <Item text={itemZero.text} />
         {renderData}
       </ScrollView>
       <StatusBar style="auto" />
