@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, SafeAreaView, View, FlatList } from 'react-native';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 const randomColor = () => {
   const color = Math.floor(Math.random() * 16777215)
@@ -14,11 +14,25 @@ const data = [...Array(20).keys()].map(i => ({
   text: `Item ${i}`
 }))
 
-const Item = ({ text, backgroundColor }) => (
-  <View style={[styles.item, { backgroundColor }]}>
-    <Text style={styles.text}>{text}</Text>
-  </View>
-);
+const _Item = ({ item }) => {
+  return (
+    <View key={item.id} style={styles.item}>
+      <Text style={styles.text}>{item.text}</Text>
+    </View>
+  )
+};
+
+const Item = memo(_Item)
+
+const renderItem = ({ item }) => {
+  console.log('renderItem')
+  return(
+    <Item item={item}/>
+  )
+};
+
+const [itemZero, ...restData] = data
+const keyExtractor = item => item.id
 
 const App = () => {
   const [isSticky, setIsSticky] = useState(false)
@@ -27,10 +41,6 @@ const App = () => {
     setIsSticky((isSticky) => !isSticky)
   }
 
-  const renderItem = backgroundColor => ({ item }) => (
-    <Item text={item.text} backgroundColor={backgroundColor}/>
-  );
-
   return (
     <SafeAreaView style={styles.container}>
       <Text>Press below button to toggle Item 0 stickiness. Color change indicates a re-render.</Text>
@@ -38,11 +48,11 @@ const App = () => {
         onPress={onButtonPress}
         title={isSticky ? 'Un-stick' : 'Stick'}
       />
+      <Item item={itemZero}/>
       <FlatList
-        data={data}
-        renderItem={renderItem(randomColor())}
-        keyExtractor={item => item.id}
-        stickyHeaderIndices={isSticky ? [0] : []}
+        data={restData}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
       />
       <StatusBar style="auto" />
     </SafeAreaView>
