@@ -14,8 +14,7 @@ const data = [...Array(20).keys()].map(i => ({
   text: `Item ${i}`
 }))
 
-const _Item = ({ text })  => {
-  console.log('render')
+const Item = ({ text })  => {
   return (
     <View style={styles.item}>
       <Text style={styles.text}>{text}</Text>
@@ -23,20 +22,20 @@ const _Item = ({ text })  => {
   );
 }
 
-const Item = memo(_Item, () => true)
+const renderItem = ({ item }) => {
+  console.log('renderItem')
+  return (
+    <Item text={item.text} />
+  );
+}
+
+const renderData = data.map(d => renderItem({ item: d }))
 
 const App = () => {
   const [isSticky, setIsSticky] = useState(false)
 
   const onButtonPress = () => {
     setIsSticky((isSticky) => !isSticky)
-  }
-
-  const renderItem = ({ item }) => {
-    console.log('renderItem')
-    return (
-      <Item text={item.text} />
-    );
   }
 
   return (
@@ -46,10 +45,8 @@ const App = () => {
         onPress={onButtonPress}
         title={isSticky ? 'Un-stick' : 'Stick'}
       />
-      <ScrollView
-        stickyHeaderIndices={isSticky ? [0] : []}
-      >
-        {data.map(d => renderItem({ item: d }))}
+      <ScrollView>
+        {renderData}
       </ScrollView>
       <StatusBar style="auto" />
     </SafeAreaView>
