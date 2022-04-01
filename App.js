@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, SafeAreaView, View, FlatList, ScrollView } from 'react-native';
 import { useState, useRef } from 'react';
 import { PortalProvider, Portal, PortalHost } from '@gorhom/portal'
-import { FullWindowOverlay } from 'react-native-screens';
+import YoutubePlayer from "react-native-youtube-iframe";
 
 const randomColor = () => {
   const color = Math.floor(Math.random() * 16777215)
@@ -32,33 +32,43 @@ const renderItem = ({ item }) => {
 }
 
 const [itemZero, ...restData] = data
-const renderData = restData.map(d => renderItem({ item: d }))
+const renderData = data.map(d => renderItem({ item: d }))
 
 const App = () => {
   const [isSticky, setIsSticky] = useState(false)
 
   const onScroll = event => {
-    setIsSticky(event.nativeEvent.contentOffset.y >= 100);
+    // setIsSticky(event.nativeEvent.contentOffset.y >= 100);
   };
+
+  const onButtonPress = () => {
+    setIsSticky((isSticky) => !isSticky)
+  }
 
   return (
     <PortalProvider>
-      {/*<FullWindowOverlay>*/}
         <SafeAreaView style={styles.container}>
           <Text>Press below button to toggle Item 0 stickiness. Color change indicates a re-render.</Text>
-          {/*{isSticky && <Item text={data[0].text} />}*/}
+          <Button
+            onPress={onButtonPress}
+            title={isSticky ? 'Un-stick' : 'Stick'}
+          />
           {isSticky && <PortalHost name="CustomPortalHost" />}
-          {/*<PortalHost name="CustomPortalHost" />*/}
 
           <ScrollView onScroll={onScroll} scrollEventThrottle={16}>
-            <Portal hostName="CustomPortalHost">
-              <Item text={itemZero.text} />
-            </Portal>
+            {!isSticky && <PortalHost name="CustomPortalHost" />}
             {renderData}
           </ScrollView>
           <StatusBar style="auto" />
+
+          <Portal hostName="CustomPortalHost">
+            <YoutubePlayer
+              height={200}
+              videoId={"jnoUtTQfxts"}
+              play
+            />
+          </Portal>
         </SafeAreaView>
-      {/*</FullWindowOverlay>*/}
     </PortalProvider>
   );
 }
