@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, SafeAreaView, View, FlatList, ScrollView } from 'react-native';
 import { useState, useRef } from 'react';
+import { PortalProvider, Portal, PortalHost } from '@gorhom/portal'
+import { FullWindowOverlay } from 'react-native-screens';
 
 const randomColor = () => {
   const color = Math.floor(Math.random() * 16777215)
@@ -15,6 +17,7 @@ const data = [...Array(20).keys()].map(i => ({
 }))
 
 const Item = ({ text })  => {
+  console.log('render Item')
   return (
     <View style={styles.item}>
       <Text style={styles.text}>{text}</Text>
@@ -23,7 +26,6 @@ const Item = ({ text })  => {
 }
 
 const renderItem = ({ item }) => {
-  console.log('renderItem')
   return (
     <Item text={item.text} key={item.id} />
   );
@@ -40,16 +42,24 @@ const App = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text>Press below button to toggle Item 0 stickiness. Color change indicates a re-render.</Text>
-      {isSticky && <Item text={data[0].text} />}
+    <PortalProvider>
+      {/*<FullWindowOverlay>*/}
+        <SafeAreaView style={styles.container}>
+          <Text>Press below button to toggle Item 0 stickiness. Color change indicates a re-render.</Text>
+          {/*{isSticky && <Item text={data[0].text} />}*/}
+          {isSticky && <PortalHost name="CustomPortalHost" />}
+          {/*<PortalHost name="CustomPortalHost" />*/}
 
-      <ScrollView onScroll={onScroll} scrollEventThrottle={16}>
-        <Item text={itemZero.text} />
-        {renderData}
-      </ScrollView>
-      <StatusBar style="auto" />
-    </SafeAreaView>
+          <ScrollView onScroll={onScroll} scrollEventThrottle={16}>
+            <Portal hostName="CustomPortalHost">
+              <Item text={itemZero.text} />
+            </Portal>
+            {renderData}
+          </ScrollView>
+          <StatusBar style="auto" />
+        </SafeAreaView>
+      {/*</FullWindowOverlay>*/}
+    </PortalProvider>
   );
 }
 
