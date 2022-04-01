@@ -1,8 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, SafeAreaView, View, FlatList, ScrollView } from 'react-native';
 import { useState, useRef } from 'react';
-import { PortalProvider, Portal, PortalHost } from '@gorhom/portal'
 import YoutubePlayer from "react-native-youtube-iframe";
+import { PortalDestination, PortalOrigin } from "rn-native-portals";
 
 const randomColor = () => {
   const color = Math.floor(Math.random() * 16777215)
@@ -46,30 +46,28 @@ const App = () => {
   }
 
   return (
-    <PortalProvider>
-        <SafeAreaView style={styles.container}>
-          <Text>Press below button to toggle Item 0 stickiness. Color change indicates a re-render.</Text>
-          <Button
-            onPress={onButtonPress}
-            title={isSticky ? 'Un-stick' : 'Stick'}
+    <SafeAreaView style={styles.container}>
+      <Text>Press below button to toggle Item 0 stickiness. Color change indicates a re-render.</Text>
+      <Button
+        onPress={onButtonPress}
+        title={isSticky ? 'Un-stick' : 'Stick'}
+      />
+      {/*{isSticky && <PortalHost name="CustomPortalHost" />}*/}
+      {isSticky && <PortalDestination name="StickyPortal"/>}
+
+      <ScrollView onScroll={onScroll} scrollEventThrottle={16}>
+        {/*{!isSticky && <PortalHost name="CustomPortalHost" />}*/}
+        <PortalOrigin destination={isSticky ? 'StickyPortal' : 'StickyPortal'}>
+          <YoutubePlayer
+            height={200}
+            videoId={"jnoUtTQfxts"}
+            play
           />
-          {isSticky && <PortalHost name="CustomPortalHost" />}
-
-          <ScrollView onScroll={onScroll} scrollEventThrottle={16}>
-            {!isSticky && <PortalHost name="CustomPortalHost" />}
-            {renderData}
-          </ScrollView>
-          <StatusBar style="auto" />
-
-          <Portal hostName="CustomPortalHost">
-            <YoutubePlayer
-              height={200}
-              videoId={"jnoUtTQfxts"}
-              play
-            />
-          </Portal>
-        </SafeAreaView>
-    </PortalProvider>
+        </PortalOrigin>
+        {renderData}
+      </ScrollView>
+      <StatusBar style="auto" />
+    </SafeAreaView>
   );
 }
 
