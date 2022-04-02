@@ -2,6 +2,8 @@
 
 A playground repo to try sticky element in React Native scrolling view.
 
+https://user-images.githubusercontent.com/20895743/161380698-2f5572ec-c9f5-4f19-8aa4-2d63cdbcf0bf.mov
+
 ## Installation
 
 For this demo to work, we need to install the [`rn-native-portals`](https://github.com/dylancom/rn-native-portals) that's not published to NPM, and because it's just a demo, let's install it locally instead of published it to NPM.
