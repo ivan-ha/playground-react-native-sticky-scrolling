@@ -52,12 +52,12 @@ const App = () => {
         onPress={onButtonPress}
         title={isSticky ? 'Un-stick' : 'Stick'}
       />
-      {/*{isSticky && <PortalHost name="CustomPortalHost" />}*/}
-      {isSticky && <PortalDestination name="StickyPortal"/>}
+      {isSticky && <View style={styles.stickyPlaceholder}>
+        <PortalDestination name="StickyPortal"/>
+      </View>}
 
       <ScrollView onScroll={onScroll} scrollEventThrottle={16}>
-        {/*{!isSticky && <PortalHost name="CustomPortalHost" />}*/}
-        <PortalOrigin destination={isSticky ? 'StickyPortal' : 'StickyPortal'}>
+        <PortalOrigin destination={!isSticky ? null : 'StickyPortal'}>
           <YoutubePlayer
             height={200}
             videoId={"jnoUtTQfxts"}
@@ -85,6 +85,9 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
   },
+  stickyPlaceholder: {
+    height: 60
+  }
 });
 
 export default App
