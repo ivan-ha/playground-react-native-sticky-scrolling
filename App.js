@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, SafeAreaView, View, FlatList } from 'react-native';
-import { useState } from 'react';
+import { Button, StyleSheet, Text, SafeAreaView, View, FlatList, ScrollView } from 'react-native';
+import { useState, useRef } from 'react';
+import YoutubePlayer from "react-native-youtube-iframe";
+import { PortalDestination, PortalOrigin } from "rn-native-portals";
 
 const randomColor = () => {
   const color = Math.floor(Math.random() * 16777215)
@@ -14,22 +16,34 @@ const data = [...Array(20).keys()].map(i => ({
   text: `Item ${i}`
 }))
 
-const Item = ({ text, backgroundColor }) => (
-  <View style={[styles.item, { backgroundColor }]}>
-    <Text style={styles.text}>{text}</Text>
-  </View>
-);
+const Item = ({ text })  => {
+  console.log('render Item')
+  return (
+    <View style={styles.item}>
+      <Text style={styles.text}>{text}</Text>
+    </View>
+  );
+}
+
+const renderItem = ({ item }) => {
+  return (
+    <Item text={item.text} key={item.id} />
+  );
+}
+
+const [itemZero, ...restData] = data
+const renderData = data.map(d => renderItem({ item: d }))
 
 const App = () => {
   const [isSticky, setIsSticky] = useState(false)
 
+  const onScroll = event => {
+    // setIsSticky(event.nativeEvent.contentOffset.y >= 100);
+  };
+
   const onButtonPress = () => {
     setIsSticky((isSticky) => !isSticky)
   }
-
-  const renderItem = backgroundColor => ({ item }) => (
-    <Item text={item.text} backgroundColor={backgroundColor}/>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -38,12 +52,20 @@ const App = () => {
         onPress={onButtonPress}
         title={isSticky ? 'Un-stick' : 'Stick'}
       />
-      <FlatList
-        data={data}
-        renderItem={renderItem(randomColor())}
-        keyExtractor={item => item.id}
-        stickyHeaderIndices={isSticky ? [0] : []}
-      />
+      {isSticky && <View style={styles.stickyPlaceholder}>
+        <PortalDestination name="StickyPortal"/>
+      </View>}
+
+      <ScrollView onScroll={onScroll} scrollEventThrottle={16}>
+        <PortalOrigin destination={!isSticky ? null : 'StickyPortal'}>
+          <YoutubePlayer
+            height={200}
+            videoId={"jnoUtTQfxts"}
+            play
+          />
+        </PortalOrigin>
+        {renderData}
+      </ScrollView>
       <StatusBar style="auto" />
     </SafeAreaView>
   );
@@ -63,6 +85,9 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
   },
+  stickyPlaceholder: {
+    height: 60
+  }
 });
 
 export default App
